@@ -1,16 +1,1278 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>taxcomputer</title>
-  <style>body{font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;padding:2rem;line-height:1.5;color:#111;background:#f7f7f9}</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个税计算器 - 2025版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            align-items: stretch;
+        }
+
+        .input-section {
+            padding: 30px;
+            background: #f8f9fa;
+            border-right: 1px solid #e0e0e0;
+            position: relative;
+        }
+
+        .result-section {
+            padding: 30px;
+            background: white;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .input-section {
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            font-weight: normal;
+        }
+
+        .radio-group input[type="radio"] {
+            width: auto;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: "";
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+
+        .btn-reset {
+            width: 100%;
+            padding: 12px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn-reset:hover {
+            background: #5a6268;
+        }
+
+        .btn-calculate {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-calculate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-calculate:active {
+            transform: translateY(0);
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .result-card .label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .result-card .value {
+            font-size: 42px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .result-card .unit {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-item .label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .detail-item .value {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .detail-item.total {
+            background: #f0f0f0;
+            margin: 0 -30px;
+            padding: 15px 30px;
+            border-top: 2px solid #ddd;
+            border-bottom: none;
+        }
+
+        .detail-item.total .label {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .detail-item.total .value {
+            color: #667eea;
+            font-size: 20px;
+        }
+
+        .detail-item.total-highlight {
+            background: #f0f0f0;
+            margin: 0 -30px;
+            padding: 15px 30px;
+            border-top: 2px solid #ddd;
+            border-bottom: none;
+        }
+
+        .detail-item.total-highlight .label {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .detail-item.total-highlight .value {
+            color: #e91e63;
+            font-size: 20px;
+        }
+
+        .detail-item.total-year-amount {
+            background: #f0f0f0;
+            margin: 0 -30px;
+            padding: 15px 30px;
+            border-top: 2px solid #ddd;
+            border-bottom: none;
+        }
+
+        .detail-item.total-year-amount .label {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .detail-item.total-year-amount .value {
+            color: #9b59b6;
+            font-size: 20px;
+        }
+
+        .effective-rate {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .effective-rate .rate {
+            font-size: 24px;
+            font-weight: bold;
+            color: #856404;
+        }
+
+        .effective-rate .text {
+            font-size: 12px;
+            color: #856404;
+            margin-top: 5px;
+        }
+
+        .deduction-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .deduction-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .deduction-field .field-label {
+            white-space: nowrap;
+            font-size: 13px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .deduction-field input {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .deduction-hint {
+            font-size: 11px;
+            color: #999;
+            margin-top: 2px;
+            line-height: 1.4;
+        }
+
+        .deduction-field-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .warning-alert {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-left: 4px solid #ffc107;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-top: 15px;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .warning-alert.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .warning-alert .warning-title {
+            color: #856404;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .warning-alert .warning-text {
+            color: #856404;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .form-group input:disabled {
+            background-color: #f5f5f5;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .form-group input:disabled::placeholder {
+            color: #ccc;
+        }
+    </style>
 </head>
 <body>
-  <h1>taxcomputer 已部署</h1>
-  <p>这是仓库 <strong>dingachong/taxcomputer</strong> 的默认首页 (index.html)。</p>
-  <p>将此文件替换为你的站点内容或在 Pages 设置中指定正确的发布目录。</p>
-  <hr>
-  <p>如果你使用自定义域或 GitHub Actions 发布，确保 Pages 设置和 DNS 配置正确。</p>
+    <div class="container">
+        <div class="header">
+            <h1>💰 个税计算器 - 2025版</h1>
+            <p>支持2025年最新个税政策 | 起征点5000元/月</p>
+        </div>
+
+        <div class="content">
+            <div class="input-section">
+                <h2 class="section-title">收入信息</h2>
+
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="salaryType" value="month" checked onchange="toggleSalaryType()">
+                        按月计算
+                    </label>
+                    <label>
+                        <input type="radio" name="salaryType" value="year" onchange="toggleSalaryType()">
+                        按年计算
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>当前计算月份</label>
+                    <select id="currentMonth" onchange="calculate()" style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
+                        <option value="1">1月</option>
+                        <option value="2">2月</option>
+                        <option value="3">3月</option>
+                        <option value="4">4月</option>
+                        <option value="5">5月</option>
+                        <option value="6">6月</option>
+                        <option value="7">7月</option>
+                        <option value="8">8月</option>
+                        <option value="9">9月</option>
+                        <option value="10">10月</option>
+                        <option value="11">11月</option>
+                        <option value="12" selected>12月</option>
+                    </select>
+                    <small>用于计算累计预扣预缴个税</small>
+                </div>
+
+                <div class="form-group" id="monthSalaryGroup">
+                    <label>税前月薪</label>
+                    <input type="number" id="monthlySalary" placeholder="请输入月薪" value="0" onchange="calculate()">
+                </div>
+
+                <div class="form-group" id="yearSalaryGroup" style="display: none;">
+                    <label>税前年薪</label>
+                    <input type="number" id="yearlySalary" placeholder="请输入年薪" onchange="calculate()">
+                </div>
+
+                <h2 class="section-title">五险一金</h2>
+
+                <div class="form-group">
+                    <label>社保缴费基数</label>
+                    <input type="number" id="socialBase" placeholder="默认等于月薪" onchange="calculate()">
+                    <small>留空则等于月薪</small>
+                </div>
+
+                <div class="form-group">
+                    <label>公积金比例（个人部分）</label>
+                    <input type="number" id="fundRate" placeholder="5-12" value="12" min="5" max="12" step="1" onchange="calculate()">
+                    <small>个人缴存比例，范围5%-12%</small>
+                </div>
+
+                <div class="form-group">
+                    <label>公积金缴费基数</label>
+                    <input type="number" id="fundBase" placeholder="默认等于社保基数" onchange="calculate()">
+                    <small>留空则等于社保基数</small>
+                </div>
+
+                <h2 class="section-title">其他收入</h2>
+
+                <div class="form-group">
+                    <label>💰 年终奖</label>
+                    <input type="number" id="yearEndBonus" placeholder="请输入年终奖金额" value="0" onchange="calculate()">
+                    <small>全年一次性奖金，可空</small>
+                </div>
+
+                <div class="form-group">
+                    <label>年终奖计税方式</label>
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="bonusTaxMethod" value="separate" checked onchange="calculate()">
+                            单独计税
+                        </label>
+                        <label>
+                            <input type="radio" name="bonusTaxMethod" value="combined" onchange="calculate()">
+                            并入综合所得
+                        </label>
+                    </div>
+                    <small>单独计税更优惠，但选择后一年内不得变更</small>
+                </div>
+
+                <div class="form-group">
+                    <label>📋 劳务报酬总额（元/年）</label>
+                    <input type="number" id="laborIncome" placeholder="请输入全年劳务报酬总额" oninput="onLaborTotalChange()">
+                    <small>填写总额后，每月劳务报酬将自动计算</small>
+                </div>
+
+                <div class="form-group">
+                    <label>📅 每月劳务报酬（元/月）</label>
+                    <input type="number" id="monthlyLaborIncome" placeholder="或填写每月劳务报酬" oninput="onLaborMonthlyChange()">
+                    <small>填写每月金额后，总额将自动计算（×12）</small>
+                </div>
+
+                <div class="form-group">
+                    <label style="color: #9b59b6;">每月劳务报酬预扣预缴个税</label>
+                    <div id="monthlyLaborTaxDisplay" style="font-size: 18px; font-weight: bold; color: #9b59b6; padding: 10px 0;">0.00 元</div>
+                    <small>按照每月劳务报酬的80%作为基数计算预扣预缴个税</small>
+                </div>
+
+                <h2 class="section-title">专项附加扣除</h2>
+                <small style="display: block; margin-bottom: 15px; color: #666;">每月可扣除金额（元）</small>
+
+                <div class="deduction-item">
+                    <div class="deduction-field">
+                        <span class="field-label">👶 子女教育</span>
+                        <div class="deduction-field-wrapper">
+                            <input type="number" id="deduction_child" placeholder="金额" value="0" onchange="calculate(); updateTotalDeductionDisplay();">
+                            <div class="deduction-hint">标准：2000元/月·子女（2023年起提高）</div>
+                            <div class="deduction-hint">父母一方100%扣除或双方各50%扣除</div>
+                        </div>
+                    </div>
+
+                    <div class="deduction-field">
+                        <span class="field-label">👴 赡养老人</span>
+                        <div class="deduction-field-wrapper">
+                            <input type="number" id="deduction_elder" placeholder="金额" value="0" onchange="calculate(); updateTotalDeductionDisplay();">
+                            <div class="deduction-hint">独生子女3000元/月（2023年起提高）</div>
+                            <div class="deduction-hint">非独生兄弟姐妹分摊3000元/月，每人≤1500元</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="deduction-item">
+                    <div class="deduction-field">
+                        <span class="field-label">📚 继续教育</span>
+                        <div class="deduction-field-wrapper">
+                            <input type="number" id="deduction_education" placeholder="金额" value="0" onchange="calculate(); updateTotalDeductionDisplay();">
+                            <div class="deduction-hint">学历（学位）教育400元/月，限48个月</div>
+                            <div class="deduction-hint">职业资格证书3600元/年，取得证书当年</div>
+                        </div>
+                    </div>
+
+                    <div class="deduction-field">
+                        <span class="field-label">🏠 住房贷款利息</span>
+                        <div class="deduction-field-wrapper">
+                            <input type="number" id="deduction_housing" placeholder="金额" value="0" oninput="onHousingInputChange()" onchange="updateTotalDeductionDisplay();">
+                            <div class="deduction-hint">标准：1000元/月（首套住房贷款利息）</div>
+                            <div class="deduction-hint">夫妻双方约定由一方扣除，各自50%</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="deduction-item">
+                    <div class="deduction-field">
+                        <span class="field-label">🔑 住房租金</span>
+                        <div class="deduction-field-wrapper">
+                            <input type="number" id="deduction_rent" placeholder="金额" value="0" oninput="onRentInputChange()" onchange="updateTotalDeductionDisplay();">
+                            <div class="deduction-hint">直辖市/省会/计划单列市1500元/月</div>
+                            <div class="deduction-hint">人口>100万城市1100元/月，≤100万800元/月</div>
+                        </div>
+                    </div>
+
+                    <div class="deduction-field">
+                        <span class="field-label">🏥 大病医疗</span>
+                        <div class="deduction-field-wrapper">
+                            <input type="number" id="deduction_medical" placeholder="金额" value="0" onchange="calculate(); updateTotalDeductionDisplay();">
+                            <div class="deduction-hint">医保报销后自付超15000元部分扣除</div>
+                            <div class="deduction-hint">年度限额80000元，汇算清缴时据实扣除</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="deduction-item">
+                    <div class="deduction-field">
+                        <span class="field-label">👶 3岁以下婴幼儿</span>
+                        <div class="deduction-field-wrapper">
+                            <input type="number" id="deduction_3child" placeholder="金额" value="0" onchange="calculate(); updateTotalDeductionDisplay();">
+                            <div class="deduction-hint">标准：2000元/月·婴幼儿（2023年起提高）</div>
+                            <div class="deduction-hint">父母一方100%扣除或双方各50%扣除</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="warning-alert" id="housingWarning">
+                    <div class="warning-title">⚠️ 重要提示</div>
+                    <div class="warning-text">住房贷款利息和住房租金扣除不能同时享受，只能二选一。请检查您的填写是否正确。</div>
+                </div>
+
+                <button class="btn-reset" onclick="resetForm()" style="position: absolute; top: 20px; right: 20px; padding: 8px 16px; margin: 0;">↺ 重置</button>
+            </div>
+
+            <div class="result-section">
+                <h2 class="section-title">计算结果</h2>
+
+                <div class="result-card">
+                    <div class="label">税后月薪</div>
+                    <div class="value" id="netSalary">0</div>
+                    <div class="unit">元/月</div>
+                </div>
+
+                <div class="effective-rate">
+                    <div class="rate" id="effectiveRate">0%</div>
+                    <div class="text">综合税率（个税+五险一金占收入比例）</div>
+                </div>
+
+                <h2 class="section-title" style="margin-top: 25px;">月收入明细</h2>
+
+                <div class="detail-item total-highlight">
+                    <span class="label">税前月薪</span>
+                    <span class="value" id="detail_gross">0</span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="label">养老保险 (8%)</span>
+                    <span class="value" id="detail_pension">0</span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="label">医疗保险 (2%)</span>
+                    <span class="value" id="detail_medical">0</span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="label">失业保险 (0.5%)</span>
+                    <span class="value" id="detail_unemployment">0</span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="label">住房公积金</span>
+                    <span class="value" id="detail_fund">0</span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="label">专项附加扣除</span>
+                    <span class="value" id="detail_deduction">0</span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="label">至上月个税预扣预缴</span>
+                    <span class="value" id="detail_tax_prev_month">0</span>
+                </div>
+
+                <div class="detail-item total-highlight">
+                    <span class="label">当月薪金个人所得税</span>
+                    <span class="value" id="detail_tax">0</span>
+                </div>
+
+                <div class="detail-item total-highlight">
+                    <span class="label">五险一金合计</span>
+                    <span class="value" id="detail_social_total">0</span>
+                </div>
+
+                <div class="detail-item total-highlight">
+                    <span class="label">税后月薪</span>
+                    <span class="value" id="detail_net">0</span>
+                </div>
+
+                <div class="detail-item total">
+                    <span class="label">税后年薪（不含年终一次性奖金）</span>
+                    <span class="value" id="year_net_salary_no_bonus">0</span>
+                </div>
+
+                <h2 class="section-title" style="margin-top: 25px;">年度汇总</h2>
+
+                <div class="detail-item total-year-amount">
+                    <span class="label">年度税前收入总额</span>
+                    <span class="value" id="year_gross">0</span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="label">其中：年薪收入</span>
+                    <span class="value" id="year_salary_gross">0</span>
+                </div>
+
+                <div class="detail-item" id="yearLaborDetail" style="display: none;">
+                    <span class="label">其中：劳务报酬收入</span>
+                    <span class="value" id="year_labor_gross">0</span>
+                </div>
+
+                <div class="detail-item" id="yearLaborDeductDetail" style="display: none; background: #f0f8ff;">
+                    <span class="label">劳务报酬费用扣除（20%）</span>
+                    <span class="value" id="year_labor_deduct">0</span>
+                </div>
+
+                <div class="detail-item" id="yearLaborNetDetail" style="display: none; background: #f0f8ff;">
+                    <span class="label">劳务报酬计入综合所得（80%）</span>
+                    <span class="value" id="year_labor_net">0</span>
+                </div>
+
+                <div class="detail-item" id="yearBonusDetail" style="display: none;">
+                    <span class="label">其中：年终奖收入</span>
+                    <span class="value" id="year_bonus_gross">0</span>
+                </div>
+
+                <div class="detail-item" style="background: #fff3cd;">
+                    <span class="label">基本减除费用</span>
+                    <span class="value">60,000</span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="label">五险一金合计（年度）</span>
+                    <span class="value" id="year_social_deduction">0</span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="label">专项附加扣除合计（年度）</span>
+                    <span class="value" id="year_special_deduction">0</span>
+                </div>
+
+                <div class="detail-item total">
+                    <span class="label">年度应纳税所得额</span>
+                    <span class="value" id="year_taxable_income">0</span>
+                </div>
+
+                <div class="detail-item total-year-amount">
+                    <span class="label">年度个税总额</span>
+                    <span class="value" id="year_tax">0</span>
+                </div>
+
+                <div class="detail-item" id="yearBonusTaxDetail" style="display: none;">
+                    <span class="label">其中：年终奖个税</span>
+                    <span class="value" id="year_bonus_tax">0</span>
+                </div>
+
+                <div class="detail-item total-year-amount">
+                    <span class="label">年度税后收入</span>
+                    <span class="value" id="year_net">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 月度税率表（用于月薪个税计算）
+        const monthlyTaxBrackets = [
+            { limit: 3000, rate: 0.03, deduction: 0 },
+            { limit: 12000, rate: 0.10, deduction: 210 },
+            { limit: 25000, rate: 0.20, deduction: 1410 },
+            { limit: 35000, rate: 0.25, deduction: 2660 },
+            { limit: 55000, rate: 0.30, deduction: 4410 },
+            { limit: 80000, rate: 0.35, deduction: 7160 },
+            { limit: Infinity, rate: 0.45, deduction: 15160 }
+        ];
+
+        // 年度个人所得税税率表（综合所得适用）
+        // 来源：个人所得税税率表（综合所得适用）
+        const yearlyTaxBrackets = [
+            { limit: 36000, rate: 0.03, deduction: 0 },
+            { limit: 144000, rate: 0.10, deduction: 2520 },
+            { limit: 300000, rate: 0.20, deduction: 16920 },
+            { limit: 420000, rate: 0.25, deduction: 31920 },
+            { limit: 660000, rate: 0.30, deduction: 52920 },
+            { limit: 960000, rate: 0.35, deduction: 85920 },
+            { limit: Infinity, rate: 0.45, deduction: 181920 }
+        ];
+
+        // 年终奖税率表（单独计税适用）
+        const bonusTaxBrackets = [
+            { limit: 3000, rate: 0.03, deduction: 0 },
+            { limit: 12000, rate: 0.10, deduction: 210 },
+            { limit: 25000, rate: 0.20, deduction: 1410 },
+            { limit: 35000, rate: 0.25, deduction: 2660 },
+            { limit: 55000, rate: 0.30, deduction: 4410 },
+            { limit: 80000, rate: 0.35, deduction: 7160 },
+            { limit: Infinity, rate: 0.45, deduction: 15160 }
+        ];
+
+        function toggleSalaryType() {
+            const isMonth = document.querySelector('input[name="salaryType"]:checked').value === 'month';
+            document.getElementById('monthSalaryGroup').style.display = isMonth ? 'block' : 'none';
+            document.getElementById('yearSalaryGroup').style.display = isMonth ? 'none' : 'block';
+            // 触发重新计算，确保显示及时更新
+            calculate();
+        }
+
+        // 劳务报酬总额改变时的处理
+        function onLaborTotalChange() {
+            const totalIncome = document.getElementById('laborIncome');
+            const monthlyInput = document.getElementById('monthlyLaborIncome');
+
+            if (totalIncome.value && totalIncome.value !== '') {
+                const monthly = parseFloat(totalIncome.value) / 12;
+                monthlyInput.value = monthly.toFixed(2);
+                monthlyInput.disabled = true;
+            } else {
+                monthlyInput.value = '';
+                monthlyInput.disabled = false;
+            }
+            updateLaborWithholdingTaxDisplay();
+            // 触发完整计算，更新年度汇总
+            calculate();
+        }
+
+        // 每月劳务报酬改变时的处理
+        function onLaborMonthlyChange() {
+            const monthlyIncome = document.getElementById('monthlyLaborIncome');
+            const totalInput = document.getElementById('laborIncome');
+
+            if (monthlyIncome.value && monthlyIncome.value !== '') {
+                const total = parseFloat(monthlyIncome.value) * 12;
+                totalInput.value = total.toFixed(2);
+                totalInput.disabled = true;
+            } else {
+                totalInput.value = '';
+                totalInput.disabled = false;
+            }
+            updateLaborWithholdingTaxDisplay();
+            // 触发完整计算，更新年度汇总
+            calculate();
+        }
+
+        // 住房贷款利息输入变化时，清空住房租金
+        function onHousingInputChange() {
+            const housingInput = document.getElementById('deduction_housing');
+            const rentInput = document.getElementById('deduction_rent');
+
+            if (housingInput.value && housingInput.value !== '' && parseFloat(housingInput.value) > 0) {
+                rentInput.value = '';
+            }
+            checkHousingConflict();
+        }
+
+        // 住房租金输入变化时，清空住房贷款利息
+        function onRentInputChange() {
+            const rentInput = document.getElementById('deduction_rent');
+            const housingInput = document.getElementById('deduction_housing');
+
+            if (rentInput.value && rentInput.value !== '' && parseFloat(rentInput.value) > 0) {
+                housingInput.value = '';
+            }
+            checkHousingConflict();
+        }
+
+        // 检查住房贷款利息和住房租金冲突
+        function checkHousingConflict() {
+            const deduction_housing = parseFloat(document.getElementById('deduction_housing').value) || 0;
+            const deduction_rent = parseFloat(document.getElementById('deduction_rent').value) || 0;
+
+            // 调用计算函数以更新警告提示
+            calculate();
+        }
+
+        function formatMoney(num) {
+            return num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+
+        // 计算劳务报酬预扣预缴个税
+        function calculateLaborWithholdingTax(monthlyLaborIncome) {
+            if (!monthlyLaborIncome || monthlyLaborIncome <= 0) return 0;
+
+            // 按照每月劳务报酬的80%作为基数
+            const taxableAmount = monthlyLaborIncome * 0.8;
+
+            let taxRate;
+            let quickDeduction;
+
+            // 劳务报酬预扣率表二
+            if (taxableAmount <= 20000) {
+                taxRate = 0.20;
+                quickDeduction = 0;
+            } else if (taxableAmount <= 50000) {
+                taxRate = 0.30;
+                quickDeduction = 2000;
+            } else {
+                taxRate = 0.40;
+                quickDeduction = 7000;
+            }
+
+            return taxableAmount * taxRate - quickDeduction;
+        }
+
+        // 更新劳务报酬预扣预缴个税显示
+        function updateLaborWithholdingTaxDisplay() {
+            const monthlyLaborIncome = parseFloat(document.getElementById('monthlyLaborIncome').value) || 0;
+            const tax = calculateLaborWithholdingTax(monthlyLaborIncome);
+            document.getElementById('monthlyLaborTaxDisplay').textContent = formatMoney(tax) + ' 元';
+        }
+
+        // 更新专项附加扣除总额显示
+        function updateTotalDeductionDisplay() {
+            const deduction_child = parseFloat(document.getElementById('deduction_child').value) || 0;
+            const deduction_elder = parseFloat(document.getElementById('deduction_elder').value) || 0;
+            const deduction_education = parseFloat(document.getElementById('deduction_education').value) || 0;
+            const deduction_housing = parseFloat(document.getElementById('deduction_housing').value) || 0;
+            const deduction_rent = parseFloat(document.getElementById('deduction_rent').value) || 0;
+            const deduction_medical = parseFloat(document.getElementById('deduction_medical').value) || 0;
+            const deduction_3child = parseFloat(document.getElementById('deduction_3child').value) || 0;
+
+            const totalSpecialDeduction = deduction_child + deduction_elder + deduction_education +
+                                         deduction_housing + deduction_rent + deduction_medical + deduction_3child;
+
+            // 专项附加扣除总额不再显示在左侧面板
+            // document.getElementById('totalDeductionDisplay').textContent = formatMoney(totalSpecialDeduction);
+        }
+
+        // 计算累计预扣预缴税额（按年度税率表）
+        function calculateCumulativeTax(cumulativeTaxableIncome) {
+            if (cumulativeTaxableIncome <= 0) return 0;
+
+            for (const bracket of yearlyTaxBrackets) {
+                if (cumulativeTaxableIncome <= bracket.limit) {
+                    return cumulativeTaxableIncome * bracket.rate - bracket.deduction;
+                }
+            }
+            return 0;
+        }
+
+        // 计算月度个税（使用月度税率表）- 保留用于兼容
+        function calculateMonthlyTax(taxableIncome) {
+            if (taxableIncome <= 0) return 0;
+
+            for (const bracket of monthlyTaxBrackets) {
+                if (taxableIncome <= bracket.limit) {
+                    return taxableIncome * bracket.rate - bracket.deduction;
+                }
+            }
+            return 0;
+        }
+
+        // 计算年度个税（使用年度税率表）
+        function calculateYearlyTax(taxableIncome) {
+            if (taxableIncome <= 0) return 0;
+
+            for (const bracket of yearlyTaxBrackets) {
+                if (taxableIncome <= bracket.limit) {
+                    return taxableIncome * bracket.rate - bracket.deduction;
+                }
+            }
+            return 0;
+        }
+
+        // 兼容旧函数名
+        function calculateTax(taxableIncome) {
+            return calculateMonthlyTax(taxableIncome);
+        }
+
+        // 计算年终奖单独计税
+        function calculateBonusTaxSeparate(bonus) {
+            if (bonus <= 0) return 0;
+
+            const monthlyBonus = bonus / 12;
+
+            for (const bracket of bonusTaxBrackets) {
+                if (monthlyBonus <= bracket.limit) {
+                    return bonus * bracket.rate - bracket.deduction;
+                }
+            }
+            return 0;
+        }
+
+        // 计算劳务报酬个税
+        function calculateLaborTax(laborIncome, yearlyTaxableIncome, totalTaxableIncome) {
+            if (laborIncome <= 0) return { monthlyTax: 0, yearlyTax: 0, effectiveTax: 0 };
+
+            let deductAmount;
+            if (laborIncome <= 4000) {
+                deductAmount = 800;
+            } else {
+                deductAmount = laborIncome * 0.2;
+            }
+
+            const taxableAmount = laborIncome - deductAmount;
+
+            if (taxableAmount <= 0) return { monthlyTax: 0, yearlyTax: 0, effectiveTax: 0 };
+
+            let taxRate;
+            if (taxableAmount <= 20000) {
+                taxRate = 0.20;
+                }
+
+            const monthlyWithholdingTax = taxableAmount * taxRate;
+
+            const laborYearlyDeduct = laborIncome * 0.2;
+            const laborYearlyTaxable = laborIncome - laborYearlyDeduct;
+
+            const totalYearlyTaxable = totalTaxableIncome + laborYearlyTaxable;
+            const totalYearlyTax = calculateTax(totalYearlyTaxable);
+            const baseYearlyTax = calculateTax(totalTaxableIncome);
+
+            const laborYearlyTax = totalYearlyTax - baseYearlyTax;
+
+            return {
+                monthlyTax: monthlyWithholdingTax,
+                yearlyTax: laborYearlyTax > 0 ? laborYearlyTax : 0,
+                effectiveTax: laborYearlyTax > 0 ? laborYearlyTax : 0
+            };
+        }
+
+        function calculate() {
+            const isMonth = document.querySelector('input[name="salaryType"]:checked').value === 'month';
+
+            let monthlySalary;
+            if (isMonth) {
+                monthlySalary = parseFloat(document.getElementById('monthlySalary').value) || 0;
+            } else {
+                const yearlySalary = parseFloat(document.getElementById('yearlySalary').value) || 0;
+                monthlySalary = yearlySalary / 12;
+            }
+
+            // 社保缴费基数：留空则等于月薪，并显示具体数值
+            let socialBase;
+            let socialBaseDisplay;
+            const socialBaseInput = document.getElementById('socialBase');
+            if (!socialBaseInput.value || socialBaseInput.value === '') {
+                socialBase = monthlySalary;
+                socialBaseDisplay = socialBase;
+                // 显示具体数值而不是占位符
+                socialBaseInput.value = socialBase > 0 ? socialBase.toFixed(2) : '';
+            } else {
+                socialBase = parseFloat(socialBaseInput.value);
+                socialBaseDisplay = socialBase;
+            }
+
+            // 公积金缴费基数：留空则等于社保基数，并显示具体数值
+            let fundBase;
+            let fundBaseDisplay;
+            const fundBaseInput = document.getElementById('fundBase');
+            if (!fundBaseInput.value || fundBaseInput.value === '') {
+                fundBase = socialBase;
+                fundBaseDisplay = socialBaseDisplay;
+                // 显示具体数值而不是占位符
+                fundBaseInput.value = fundBase > 0 ? fundBase.toFixed(2) : '';
+            } else {
+                fundBase = parseFloat(fundBaseInput.value);
+                fundBaseDisplay = fundBase;
+            }
+
+            // 公积金比例：留空则默认12%，并显示具体数值
+            let fundRate;
+            const fundRateInput = document.getElementById('fundRate');
+            if (!fundRateInput.value || fundRateInput.value === '') {
+                fundRate = 0.12;
+                // 显示具体数值而不是占位符
+                fundRateInput.value = '12';
+            } else {
+                fundRate = parseFloat(fundRateInput.value) / 100;
+            }
+
+            const deduction_child = parseFloat(document.getElementById('deduction_child').value) || 0;
+            const deduction_elder = parseFloat(document.getElementById('deduction_elder').value) || 0;
+            const deduction_education = parseFloat(document.getElementById('deduction_education').value) || 0;
+            const deduction_housing = parseFloat(document.getElementById('deduction_housing').value) || 0;
+            const deduction_rent = parseFloat(document.getElementById('deduction_rent').value) || 0;
+            const deduction_medical = parseFloat(document.getElementById('deduction_medical').value) || 0;
+            const deduction_3child = parseFloat(document.getElementById('deduction_3child').value) || 0;
+
+            const totalSpecialDeduction = deduction_child + deduction_elder + deduction_education +
+                                         deduction_housing + deduction_rent + deduction_medical + deduction_3child;
+
+            const pension = socialBase * 0.08;
+            const medical = socialBase * 0.02;
+            const unemployment = socialBase * 0.005;
+            const fund = fundBase * fundRate;
+
+            const socialTotal = pension + medical + unemployment + fund;
+
+            const yearEndBonus = parseFloat(document.getElementById('yearEndBonus').value) || 0;
+            const bonusTaxMethod = document.querySelector('input[name="bonusTaxMethod"]:checked').value;
+
+            const laborIncomeYearly = parseFloat(document.getElementById('laborIncome').value) || 0;
+            const laborIncomeMonthly = parseFloat(document.getElementById('monthlyLaborIncome').value) || 0;
+
+            const threshold = 5000;
+            const currentMonth = parseInt(document.getElementById('currentMonth').value);
+
+            const yearlySalary = monthlySalary * 12;
+            const yearlySocialTotal = socialTotal * 12;
+            const yearlySpecialDeduction = totalSpecialDeduction * 12;
+
+            // 劳务报酬按80%计入综合所得（扣除20%费用）
+            const laborYearlyTaxable = laborIncomeYearly * 0.8;
+
+            // 累计预扣预缴法计算个税
+            // 至当月累计应纳税所得额 = 累计收入 - 累计减除费用 - 累计专项附加扣除 - 累计五险一金
+            const cumulativeTaxableIncome = Math.max(0, monthlySalary * currentMonth - threshold * currentMonth - socialTotal * currentMonth - totalSpecialDeduction * currentMonth);
+            const cumulativeTax = calculateCumulativeTax(cumulativeTaxableIncome);
+
+            // 至上月累计应纳税所得额和累计应预扣预缴税额
+            let prevCumulativeTax = 0;
+            if (currentMonth > 1) {
+                const prevCumulativeTaxableIncome = Math.max(0, monthlySalary * (currentMonth - 1) - threshold * (currentMonth - 1) - socialTotal * (currentMonth - 1) - totalSpecialDeduction * (currentMonth - 1));
+                prevCumulativeTax = calculateCumulativeTax(prevCumulativeTaxableIncome);
+            }
+
+            // 当月个税 = 至当月累计应预扣预缴税额 - 至上月累计已预扣预缴税额
+            const tax = cumulativeTax - prevCumulativeTax;
+
+            // 月度应纳税所得额（不含劳务报酬，劳务报酬按年度处理）
+            const monthlyTaxableIncome = Math.max(0, monthlySalary - threshold - socialTotal - totalSpecialDeduction);
+
+            // 年度应纳税所得额 = 工资薪金 + 劳务报酬 × 80% + 年终奖 - 基本减除费用60000 - 五险一金 - 专项附加扣除
+            const finalYearlyTaxableIncome = Math.max(0, yearlySalary + laborYearlyTaxable + yearEndBonus - 60000 - yearlySocialTotal - yearlySpecialDeduction);
+
+            // 基础年度应纳税所得额（不含年终奖）
+            const baseYearlyTaxableIncome = Math.max(0, yearlySalary + laborYearlyTaxable - 60000 - yearlySocialTotal - yearlySpecialDeduction);
+            const baseYearlyTax = calculateYearlyTax(baseYearlyTaxableIncome);
+
+            let yearlyTax = baseYearlyTax;
+            let bonusTax = 0;
+
+            // 年终奖计税
+            if (yearEndBonus > 0) {
+                if (bonusTaxMethod === 'separate') {
+                    // 单独计税：年终奖单独计算
+                    bonusTax = calculateBonusTaxSeparate(yearEndBonus);
+                    yearlyTax = baseYearlyTax;  // 年度税保持为基础税
+                } else {
+                    // 并入综合所得：年终奖并入综合所得计算
+                    yearlyTax = calculateYearlyTax(finalYearlyTaxableIncome);  // 年度税为包含年终奖的总税额
+                    bonusTax = yearlyTax - baseYearlyTax;  // 年终奖导致增加的税额
+                }
+            }
+
+            const netSalary = monthlySalary - socialTotal - tax;
+
+            const totalMonthlyTax = tax + (bonusTax / 12);
+            const effectiveRate = monthlySalary > 0 ? ((socialTotal + totalMonthlyTax) / monthlySalary * 100) : 0;
+
+            // 专项附加扣除总额不再显示在左侧面板
+            // document.getElementById('totalDeductionDisplay').textContent = formatMoney(totalSpecialDeduction);
+
+            document.getElementById('netSalary').textContent = formatMoney(netSalary + (bonusTax > 0 ? bonusTax / 12 : 0));
+            document.getElementById('effectiveRate').textContent = effectiveRate.toFixed(2) + '%';
+
+            // 税后年薪（不含年终一次性奖金）
+            const yearNetSalaryNoBonus = netSalary * 12;
+            document.getElementById('year_net_salary_no_bonus').textContent = formatMoney(yearNetSalaryNoBonus);
+
+            document.getElementById('detail_gross').textContent = formatMoney(monthlySalary);
+            document.getElementById('detail_pension').textContent = formatMoney(pension) + ` (${formatMoney(socialBaseDisplay)} × 8%)`;
+            document.getElementById('detail_medical').textContent = formatMoney(medical) + ` (${formatMoney(socialBaseDisplay)} × 2%)`;
+            document.getElementById('detail_unemployment').textContent = formatMoney(unemployment) + ` (${formatMoney(socialBaseDisplay)} × 0.5%)`;
+            document.getElementById('detail_fund').textContent = formatMoney(fund) + ` (${formatMoney(fundBaseDisplay)} × ${(fundRate * 100).toFixed(0)}%)`;
+            document.getElementById('detail_deduction').textContent = formatMoney(totalSpecialDeduction);
+            document.getElementById('detail_tax_prev_month').textContent = formatMoney(prevCumulativeTax) + ` (至${currentMonth - 1}月累计)`;
+            document.getElementById('detail_tax').textContent = formatMoney(tax) + ` (当月累计${formatMoney(cumulativeTax)})`;
+            document.getElementById('detail_social_total').textContent = formatMoney(socialTotal);
+            document.getElementById('detail_net').textContent = formatMoney(netSalary);
+
+            // 年度应纳税所得额显示
+            document.getElementById('year_taxable_income').textContent = formatMoney(finalYearlyTaxableIncome);
+
+            document.getElementById('year_salary_gross').textContent = formatMoney(yearlySalary);
+
+            // 五险一金和专项附加扣除（年度）
+            document.getElementById('year_social_deduction').textContent = formatMoney(yearlySocialTotal);
+            document.getElementById('year_special_deduction').textContent = formatMoney(yearlySpecialDeduction);
+
+            if (laborIncomeYearly > 0) {
+                document.getElementById('yearLaborDetail').style.display = 'flex';
+                document.getElementById('year_labor_gross').textContent = formatMoney(laborIncomeYearly);
+                // 显示劳务报酬费用扣除（20%）
+                document.getElementById('yearLaborDeductDetail').style.display = 'flex';
+                document.getElementById('year_labor_deduct').textContent = formatMoney(laborIncomeYearly * 0.2);
+                // 显示劳务报酬计入综合所得的金额（80%）
+                document.getElementById('yearLaborNetDetail').style.display = 'flex';
+                document.getElementById('year_labor_net').textContent = formatMoney(laborYearlyTaxable);
+            } else {
+                document.getElementById('yearLaborDetail').style.display = 'none';
+                document.getElementById('yearLaborDeductDetail').style.display = 'none';
+                document.getElementById('yearLaborNetDetail').style.display = 'none';
+            }
+
+            document.getElementById('year_gross').textContent = formatMoney(yearlySalary + yearEndBonus + laborIncomeYearly);
+
+            // 年度个税总额（根据计税方式显示）
+            if (bonusTaxMethod === 'separate' || yearEndBonus === 0) {
+                // 单独计税或无年终奖：yearlyTax和bonusTax分别计算，需要相加
+                document.getElementById('year_tax').textContent = formatMoney(yearlyTax + bonusTax);
+            } else {
+                // 并入综合所得：yearlyTax已包含年终奖税，直接显示
+                document.getElementById('year_tax').textContent = formatMoney(yearlyTax);
+            }
+
+            // 显示年终奖详情
+            if (yearEndBonus > 0) {
+                document.getElementById('yearBonusDetail').style.display = 'flex';
+                document.getElementById('year_bonus_gross').textContent = formatMoney(yearEndBonus);
+
+                // 只有单独计税时才显示年终奖个税
+                if (bonusTaxMethod === 'separate') {
+                    document.getElementById('yearBonusTaxDetail').style.display = 'flex';
+                    document.getElementById('year_bonus_tax').textContent = formatMoney(bonusTax);
+                } else {
+                    // 并入综合所得时不显示单独的年终奖个税（已包含在综合所得税中）
+                    document.getElementById('yearBonusTaxDetail').style.display = 'none';
+                }
+            } else {
+                document.getElementById('yearBonusDetail').style.display = 'none';
+                document.getElementById('yearBonusTaxDetail').style.display = 'none';
+            }
+
+            // 年度税后收入
+            if (bonusTaxMethod === 'separate' || yearEndBonus === 0) {
+                // 单独计税或无年终奖：需要减去yearlyTax和bonusTax
+                document.getElementById('year_net').textContent = formatMoney(yearlySalary + yearEndBonus + laborIncomeYearly - yearlyTax - bonusTax);
+            } else {
+                // 并入综合所得：只需减去yearlyTax（已包含年终奖税）
+                document.getElementById('year_net').textContent = formatMoney(yearlySalary + yearEndBonus + laborIncomeYearly - yearlyTax);
+            }
+
+            const hasHousingLoan = deduction_housing > 0;
+            const hasRent = deduction_rent > 0;
+            const housingWarning = document.getElementById('housingWarning');
+
+            if (hasHousingLoan && hasRent) {
+                housingWarning.classList.add('show');
+            } else {
+                housingWarning.classList.remove('show');
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('monthlySalary').value = '0';
+            document.getElementById('yearlySalary').value = '';
+
+            document.getElementById('socialBase').value = '';
+            document.getElementById('fundRate').value = '12';  // 公积金比例保持12%
+            document.getElementById('fundBase').value = '';
+
+            document.getElementById('yearEndBonus').value = '0';
+            document.querySelector('input[name="bonusTaxMethod"][value="separate"]').checked = true;
+
+            document.getElementById('laborIncome').value = '';
+            document.getElementById('laborIncome').disabled = false;
+            document.getElementById('monthlyLaborIncome').value = '';
+            document.getElementById('monthlyLaborIncome').disabled = false;
+
+            document.getElementById('deduction_child').value = '0';
+            document.getElementById('deduction_elder').value = '0';
+            document.getElementById('deduction_education').value = '0';
+            document.getElementById('deduction_housing').value = '0';
+            document.getElementById('deduction_rent').value = '0';
+            document.getElementById('deduction_medical').value = '0';
+            document.getElementById('deduction_3child').value = '0';
+
+            // 重置后重新计算
+            calculate();
+        }
+
+        function clearResults() {
+            document.getElementById('netSalary').textContent = '0.00';
+            document.getElementById('effectiveRate').textContent = '0.00%';
+            document.getElementById('year_net_salary_no_bonus').textContent = '0.00';
+            document.getElementById('monthlyLaborTaxDisplay').textContent = '0.00 元';
+            document.getElementById('detail_gross').textContent = '0.00';
+            document.getElementById('detail_pension').textContent = '0.00';
+            document.getElementById('detail_medical').textContent = '0.00';
+            document.getElementById('detail_unemployment').textContent = '0.00';
+            document.getElementById('detail_fund').textContent = '0.00';
+            document.getElementById('detail_deduction').textContent = '0.00';
+            document.getElementById('detail_tax_prev_month').textContent = '0.00';
+            document.getElementById('detail_tax').textContent = '0.00';
+            document.getElementById('detail_social_total').textContent = '0.00';
+            document.getElementById('detail_net').textContent = '0.00';
+            document.getElementById('year_gross').textContent = '0.00';
+            document.getElementById('year_salary_gross').textContent = '0.00';
+            document.getElementById('year_tax').textContent = '0.00';
+            document.getElementById('year_net').textContent = '0.00';
+            document.getElementById('year_taxable_income').textContent = '0.00';
+            document.getElementById('year_social_deduction').textContent = '0.00';
+            document.getElementById('year_special_deduction').textContent = '0.00';
+            // 专项附加扣除总额不再显示在左侧面板
+            // document.getElementById('totalDeductionDisplay').textContent = '0.00';
+
+            document.getElementById('yearLaborDetail').style.display = 'none';
+            document.getElementById('yearLaborDeductDetail').style.display = 'none';
+            document.getElementById('yearLaborNetDetail').style.display = 'none';
+            document.getElementById('yearBonusDetail').style.display = 'none';
+            document.getElementById('yearBonusTaxDetail').style.display = 'none';
+        }
+
+        // 页面加载时，使用默认值进行初始计算
+        calculate();
+    </script>
 </body>
 </html>
